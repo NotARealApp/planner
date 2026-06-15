@@ -81,9 +81,15 @@ export default function DayPlannerApp() {
       <PullIndicator visible={p.loading || pullArmed} />
 
       <StickyLeaveBar
-        visible={!p.leaveCardVisible && !!p.showLeaveCard && !!p.chosen && p.selectedDay === 0}
+        visible={!p.leaveCardVisible && !!p.showLeaveCard && !!p.leaveTrip && p.selectedDay === 0}
         icon={p.selectedDirection === "office" ? "🏢" : "🏠"}
-        time={p.chosen ? fmtTime(new Date(effDepartureMs(p.chosen)).toISOString()) : ""}
+        time={
+          p.leaveTrip
+            ? p.inProgress
+              ? fmtTime(p.leaveTrip.arrival)
+              : fmtTime(new Date(effDepartureMs(p.leaveTrip)).toISOString())
+            : ""
+        }
         onClick={() => p.leaveCardRef.current?.scrollIntoView({ behavior: "smooth" })}
       />
 
@@ -150,10 +156,10 @@ export default function DayPlannerApp() {
           </div>
         )}
 
-        {p.showLeaveCard && p.chosen && (
+        {p.showLeaveCard && p.leaveTrip && (
           <LeaveByCard
             ref={p.leaveCardRef}
-            chosen={p.chosen}
+            chosen={p.leaveTrip}
             selectedDay={p.selectedDay}
             selectedDirection={p.selectedDirection}
             now={p.now}
@@ -163,6 +169,7 @@ export default function DayPlannerApp() {
             reminderArmed={p.reminderArmed}
             onToggleReminder={p.toggleReminder}
             inProgress={p.inProgress}
+            nextTrip={p.nextTrip}
             t={p.t}
           />
         )}
@@ -186,7 +193,7 @@ export default function DayPlannerApp() {
           visibleCount={p.visibleCount}
           selectedDay={p.selectedDay}
           selectedDirection={p.selectedDirection}
-          chosenDeparture={p.chosen?.departure}
+          chosenDeparture={p.leaveTrip?.departure}
           now={p.now}
           settings={p.settings}
           staleNote={
@@ -212,7 +219,7 @@ export default function DayPlannerApp() {
 
       {p.undo && (
         <UndoToast
-          message={p.t("dp.switched", { line: p.undo.line })}
+          message={p.t("dp.switched", { line: p.undo.summary.legs[0]?.line || "" })}
           actionLabel={p.t("dp.undo")}
           onAction={p.undoSwitch}
         />

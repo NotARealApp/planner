@@ -34,11 +34,12 @@ type LeaveByCardProps = {
   reminderArmed: boolean;
   onToggleReminder: () => void;
   inProgress: boolean;
+  nextTrip: RouteSummary | null;
   t: (key: string, params?: Record<string, string | number>) => string;
 };
 
 export const LeaveByCard = forwardRef<HTMLElement, LeaveByCardProps>(function LeaveByCard(
-  { chosen, selectedDay, selectedDirection, now, userPick, onReset, canNotify, reminderArmed, onToggleReminder, inProgress, t },
+  { chosen, selectedDay, selectedDirection, now, userPick, onReset, canNotify, reminderArmed, onToggleReminder, inProgress, nextTrip, t },
   ref,
 ) {
   const origin = t(selectedDirection === "office" ? "dp.home" : "dp.office");
@@ -71,6 +72,16 @@ export const LeaveByCard = forwardRef<HTMLElement, LeaveByCardProps>(function Le
         <div className="mt-3 rounded-2xl bg-[var(--leave-col-bg)] p-3">
           <RouteLegs legs={chosen.legs} t={t} now={now} tone="primary" />
         </div>
+        {nextTrip &&
+          nextTrip.departure !== chosen.departure &&
+          effDepartureMs(nextTrip) > now.getTime() && (
+            <p className="mt-2 text-center text-xs text-on-primary-container/60">
+              {t("dp.nextFromHere", {
+                line: nextTrip.legs[0]?.line || "walk",
+                time: fmtTime(new Date(effDepartureMs(nextTrip)).toISOString()),
+              })}
+            </p>
+          )}
       </section>
     );
   }
@@ -139,6 +150,9 @@ export const LeaveByCard = forwardRef<HTMLElement, LeaveByCardProps>(function Le
         {chosen.walk ? t("dp.walkTo", { min: chosen.walk.minutes, dest: chosen.walk.dest }) : t("dp.noWalk")}
         {isUserPick ? ` · ${t("dp.yourPick")}` : ""}
       </p>
+      {!isUserPick && (
+        <p className="mt-1 text-center text-xs text-on-primary-container/55">{t("dp.tapToTrack")}</p>
+      )}
       {(canNotify || isUserPick) && (
         <div className="mt-3 flex flex-wrap justify-center gap-2">
           {canNotify && (
