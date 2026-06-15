@@ -135,9 +135,14 @@ function RouteRow({
       onKeyDown={(e) => e.key === "Enter" && onSelect(route.departure)}
       className={cn(
         "mb-2 cursor-pointer rounded-2xl border-s-4 border-outline bg-surface-high p-3 transition hover:bg-surface-highest",
-        isChosen && "border-s-primary bg-primary-container/20",
+        isChosen && "border-s-status-good bg-status-good/10 ring-2 ring-inset ring-status-good",
       )}
     >
+      {isChosen && (
+        <div className="mb-1 text-[0.66rem] font-extrabold uppercase tracking-wider text-status-good">
+          ▶ {t("dp.catchThis")}
+        </div>
+      )}
       <div className="mb-2 text-sm font-bold">
         <span className="me-2 inline-flex size-5 items-center justify-center rounded-full bg-surface-container text-xs">
           {index + 1}
