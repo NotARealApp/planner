@@ -24,18 +24,22 @@ const vazirmatn = Vazirmatn({
   variable: "--font-vazirmatn",
 });
 
+// Next does not prefix metadata manifest/icon URLs with basePath, so do it
+// ourselves — otherwise they 404 under the GitHub Pages basePath (/RealApp).
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export const metadata: Metadata = {
   title: "Assistant",
   description: "Your little daily helpers — commute, trip outfit, and more.",
-  manifest: "/manifest.json",
+  manifest: `${BASE_PATH}/manifest.json`,
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Assistant",
   },
   icons: {
-    icon: [{ url: "/icon-192.png", sizes: "192x192" }],
-    apple: "/apple-touch-icon.png",
+    icon: [{ url: `${BASE_PATH}/icon-192.png`, sizes: "192x192" }],
+    apple: `${BASE_PATH}/apple-touch-icon.png`,
   },
 };
 
