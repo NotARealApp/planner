@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { WeatherData } from "@/lib/weather";
-import { EUROPE_CC, daytimeReduce, homeCountry, sunnyHours, tripOverall, ymd } from "./logic";
+import { EUROPE_CC, daytimeReduce, geocodeTripPlace, homeCountry, sunnyHours, tripOverall, ymd } from "./logic";
 
 function fixture(): WeatherData {
   const hours = ["07", "08", "12", "21", "22"];
@@ -83,5 +83,40 @@ describe("tripOverall", () => {
       hourly: { time: [], temperature_2m: [], apparent_temperature: [], precipitation_probability: [], weathercode: [], windspeed_10m: [] },
     };
     expect(tripOverall(empty)).toBeNull();
+  });
+});
+
+describe("geocodeTripPlace", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  function mockResults(results: unknown[]) {
+    vi.stubGlobal("fetch", vi.fn(async () => ({ json: async () => ({ results }) })));
+  }
+
+  it("keeps European results, drops the rest, and builds a comma label", async () => {
+    mockResults([
+      { latitude: 48.1, longitude: 11.5, name: "München", admin1: "Bavaria", country: "Germany", country_code: "DE" },
+      { latitude: 40.7, longitude: -74, name: "New York", admin1: "NY", country: "United States", country_code: "US" },
+    ]);
+    const out = await geocodeTripPlace("m");
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ lat: 48.1, lon: 11.5, short: "München", cc: "DE", label: "München, Bavaria, Germany" });
+  });
+
+  it("preserves both same-label results (the place-chip identity case)", async () => {
+    mockResults([
+      { latitude: 50.1, longitude: 8.1, name: "Neustadt", admin1: "Hesse", country: "Germany", country_code: "DE" },
+      { latitude: 49.3, longitude: 8.1, name: "Neustadt", admin1: "Hesse", country: "Germany", country_code: "DE" },
+    ]);
+    const out = await geocodeTripPlace("Neustadt");
+    expect(out).toHaveLength(2);
+    expect(out[0].label).toBe(out[1].label);
+    // distinct coordinates are what keep them apart downstream
+    expect(out[0].lat).not.toBe(out[1].lat);
+  });
+
+  it("returns [] with no results", async () => {
+    mockResults([]);
+    expect(await geocodeTripPlace("x")).toEqual([]);
   });
 });

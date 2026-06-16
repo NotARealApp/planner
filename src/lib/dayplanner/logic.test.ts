@@ -1,21 +1,28 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   chosenSummary,
+  dayOffInfo,
   defaultDirection,
   effBoardMs,
   effDepartureMs,
+  enrichRealtime,
+  fetchRoutes,
+  fetchRoutesPadded,
+  fetchWeather,
   fmtDuration,
   fmtMins,
   fmtTime,
   isInProgress,
   leaveTier,
   lineColor,
+  loadHolidays,
   localYmd,
   mapsUrlFor,
   pickChosen,
   routeCancelled,
   routeDelayMs,
   routeId,
+  routingDateTime,
   shortPlace,
   summarizeRoute,
   type RouteLeg,
@@ -319,5 +326,149 @@ describe("defaultDirection", () => {
     expect(defaultDirection()).toBe("office");
     vi.setSystemTime(new Date(2026, 5, 16, 13, 0));
     expect(defaultDirection()).toBe("home");
+  });
+});
+
+// --- date helpers (fake timers) --------------------------------------------
+
+describe("dayOffInfo", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("flags a configured holiday by name", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 17, 9, 0)); // Wed 2026-06-17
+    expect(dayOffInfo({ "2026-06-17": "Test Day" }, 0)).toEqual({ holiday: true, name: "Test Day" });
+  });
+
+  it("flags weekends as a non-holiday day off", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 20, 9, 0)); // Sat
+    expect(dayOffInfo({}, 0)).toEqual({ holiday: false });
+  });
+
+  it("returns null on a plain weekday", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 17, 9, 0)); // Wed
+    expect(dayOffInfo({}, 0)).toBeNull();
+  });
+});
+
+describe("routingDateTime", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("returns roughly now for today", () => {
+    vi.useFakeTimers();
+    const now = new Date(2026, 5, 16, 8, 30);
+    vi.setSystemTime(now);
+    expect(routingDateTime(0, 9, 0).getTime()).toBe(now.getTime());
+  });
+
+  it("returns tomorrow at the reference time for the next day", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 16, 8, 30));
+    const r = routingDateTime(1, 9, 15);
+    expect(r.getDate()).toBe(17);
+    expect(r.getHours()).toBe(9);
+    expect(r.getMinutes()).toBe(15);
+  });
+});
+
+// --- network functions (fetch mocked) --------------------------------------
+
+function mockFetch(impl: (url: string) => unknown) {
+  const fn = vi.fn(async (url: string) => ({ json: async () => impl(url) }));
+  vi.stubGlobal("fetch", fn);
+  return fn;
+}
+
+describe("enrichRealtime", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("overlays live delay/cancellation onto the matching leg", async () => {
+    const board = "2026-06-16T08:00:00.000Z";
+    const s = makeSummary({ legs: [makeLeg({ line: "U6", boardStationId: "gid1", boardTime: board })] });
+    mockFetch(() => [
+      { label: "U6", plannedDepartureTime: new Date(board).getTime(), delayInMinutes: 4, cancelled: true, occupancy: "HIGH" },
+    ]);
+    await enrichRealtime([s]);
+    expect(s.legs[0].delayMin).toBe(4);
+    expect(s.legs[0].cancelled).toBe(true);
+    expect(s.legs[0].realTime).toBe(true);
+    expect(s.legs[0].occupancy).toBe("HIGH");
+  });
+
+  it("leaves legs untouched when nothing matches", async () => {
+    const s = makeSummary({ legs: [makeLeg({ line: "U6", boardStationId: "gid1" })] });
+    mockFetch(() => [{ label: "S8", plannedDepartureTime: 0, delayInMinutes: 9 }]);
+    await enrichRealtime([s]);
+    expect(s.legs[0].delayMin).toBe(0);
+  });
+});
+
+describe("fetchRoutes / fetchRoutesPadded", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("fetchRoutes hits the MVG routes endpoint with both endpoints", async () => {
+    const fn = mockFetch(() => []);
+    await fetchRoutes({ lat: 1, lon: 2 }, { lat: 3, lon: 4 }, new Date("2026-06-16T08:00:00.000Z"));
+    const url = fn.mock.calls[0][0];
+    expect(url).toContain("originLatitude=1&originLongitude=2");
+    expect(url).toContain("destinationLatitude=3&destinationLongitude=4");
+  });
+
+  it("fetchRoutesPadded caps results at 10 and dedupes by departure+line", async () => {
+    const mk = (min: number) => ({
+      parts: [{ from: { plannedDeparture: `2026-06-16T08:${String(min).padStart(2, "0")}:00.000Z` }, line: { label: "U6" } }],
+    });
+    let call = 0;
+    mockFetch(() => {
+      call++;
+      // First page: 3 routes. Later pages: repeat the same (no gain) → loop stops.
+      return call === 1 ? [mk(0), mk(5), mk(10)] : [mk(10)];
+    });
+    const out = await fetchRoutesPadded({ lat: 1, lon: 2 }, { lat: 3, lon: 4 }, new Date());
+    expect(out).toHaveLength(3);
+  });
+});
+
+describe("fetchWeather", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("requests the 2-day Berlin forecast", async () => {
+    const fn = mockFetch(() => ({}));
+    await fetchWeather(48.1, 11.5);
+    const url = fn.mock.calls[0][0];
+    expect(url).toContain("latitude=48.1&longitude=11.5");
+    expect(url).toContain("forecast_days=2");
+  });
+});
+
+describe("loadHolidays", () => {
+  beforeEach(() => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, v),
+      removeItem: (k: string) => void store.delete(k),
+    });
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("returns a fresh cache without fetching", async () => {
+    localStorage.setItem("holidays_DE_BY_2026", JSON.stringify({ savedAt: Date.now(), dates: { "2026-01-01": "Neujahr" } }));
+    const fn = mockFetch(() => []);
+    const out = await loadHolidays(2026);
+    expect(out).toEqual({ "2026-01-01": "Neujahr" });
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it("fetches and keeps only nationwide or Bavarian (DE-BY) holidays", async () => {
+    mockFetch(() => [
+      { date: "2026-01-01", name: "New Year", localName: "Neujahr", counties: null },
+      { date: "2026-08-15", name: "Assumption", counties: ["DE-BY"] },
+      { date: "2026-10-31", name: "Reformation", counties: ["DE-BB"] },
+    ]);
+    const out = await loadHolidays(2026);
+    expect(out).toEqual({ "2026-01-01": "Neujahr", "2026-08-15": "Assumption" });
   });
 });
