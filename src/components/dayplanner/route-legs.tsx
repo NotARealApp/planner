@@ -11,7 +11,7 @@ const MUTED: Record<Tone, string> = {
 };
 const DIVIDER: Record<Tone, string> = {
   surface: "border-outline/50",
-  primary: "border-on-primary-container/25",
+  primary: "border-current/25",
 };
 
 // Per-leg breakdown: line badge → direction, board stop, alight stop. When
@@ -39,7 +39,7 @@ export function RouteLegs({
           <div key={li} className={cn(current && "-ms-2 rounded-md bg-status-good/15 px-2 py-1")}>
             <div className="text-xs">
               <span
-                className="me-1 rounded px-1.5 py-0.5 text-[0.7rem] font-bold text-white"
+                className="me-1 rounded-md px-1.5 py-0.5 text-[0.7rem] font-bold text-white"
                 style={{ background: lineColor(leg.line, leg.transportType) }}
               >
                 {leg.line}

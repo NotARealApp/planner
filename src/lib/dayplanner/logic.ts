@@ -375,7 +375,7 @@ export async function fetchRoutesPadded(
   dateTime: Date,
   isArrival = false,
 ) {
-  let routes = await fetchRoutes(origin, dest, dateTime, isArrival);
+  const routes = await fetchRoutes(origin, dest, dateTime, isArrival);
   // Padding walks forward to the next departures — wrong direction for arrive-by,
   // so take the API's set as-is there.
   if (isArrival) return routes.slice(0, 10);

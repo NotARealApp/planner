@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 export function AppHeader({ title, actions }: { title: ReactNode; actions?: ReactNode }) {
   return (
     <header className="mb-1 flex items-center justify-between">
-      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      <h1 className="text-[1.75rem] font-normal tracking-tight">{title}</h1>
       {actions && <div className="flex gap-2">{actions}</div>}
     </header>
   );

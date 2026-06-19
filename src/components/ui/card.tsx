@@ -21,7 +21,7 @@ export function CardTitle({ className, children }: { className?: string; childre
   return (
     <h2
       className={cn(
-        "mb-3 text-xs font-medium uppercase tracking-widest text-on-surface-variant",
+        "mb-3 text-sm font-medium text-on-surface-variant",
         className,
       )}
     >

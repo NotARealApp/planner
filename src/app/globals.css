@@ -17,6 +17,10 @@
   --app-on-primary-container: #e9ddff;
   --app-secondary-container: #4a4458;
   --app-on-secondary-container: #e8def8;
+  --app-tertiary-container: #633b48;
+  --app-on-tertiary-container: #ffd9e3;
+  --app-error-container: #93000a;
+  --app-on-error-container: #ffdad6;
   --app-outline: #948f99;
   --app-outline-variant: #49454e;
   --app-status-good: #8bd99f;
@@ -27,6 +31,7 @@
   --leave-col-bg: rgba(0, 0, 0, 0.18);
   --leave-btn-bg: rgba(0, 0, 0, 0.18);
   --leave-btn-bg-hover: rgba(0, 0, 0, 0.28);
+
 }
 
 :root[data-theme="light"] {
@@ -44,6 +49,10 @@
   --app-on-primary-container: #211047;
   --app-secondary-container: #e8def8;
   --app-on-secondary-container: #1e192b;
+  --app-tertiary-container: #ffd9e3;
+  --app-on-tertiary-container: #31101d;
+  --app-error-container: #ffdad6;
+  --app-on-error-container: #410002;
   --app-outline: #7a757f;
   --app-outline-variant: #cac4cf;
   --app-status-good: #1e6b3a;
@@ -70,6 +79,10 @@
   --color-on-primary-container: var(--app-on-primary-container);
   --color-secondary-container: var(--app-secondary-container);
   --color-on-secondary-container: var(--app-on-secondary-container);
+  --color-tertiary-container: var(--app-tertiary-container);
+  --color-on-tertiary-container: var(--app-on-tertiary-container);
+  --color-error-container: var(--app-error-container);
+  --color-on-error-container: var(--app-on-error-container);
   --color-outline: var(--app-outline);
   --color-status-good: var(--app-status-good);
   --color-status-warn: var(--app-status-warn);
@@ -89,6 +102,15 @@
   /* Strong curves — built-in CSS easings are too weak for UI motion. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  /* M3 Expressive spring — slight overshoot for a lively, physical settle. */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-pop-in: pop-in 0.5s var(--ease-spring) both;
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @keyframes slide-down-in {

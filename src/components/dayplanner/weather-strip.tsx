@@ -24,7 +24,7 @@ export function WeatherStrip({ data, dayIdx, open, onToggle, t }: WeatherStripPr
         className="mb-4 flex w-full flex-wrap items-center gap-1.5 text-left text-sm text-on-surface-variant"
       >
         <WeatherIcon category={category} size={22} />
-        <span className="font-bold text-on-surface">
+        <span className="font-bold tabular-nums text-on-surface">
           {Math.round(data.daily.temperature_2m_min[dayIdx])}° /{" "}
           {Math.round(data.daily.temperature_2m_max[dayIdx])}°
         </span>
@@ -45,7 +45,7 @@ export function WeatherStrip({ data, dayIdx, open, onToggle, t }: WeatherStripPr
                 <div className="mb-0.5 flex justify-center">
                   <WeatherIcon category={e.category} size={24} />
                 </div>
-                <div className="text-sm font-bold">{e.temp}°</div>
+                <div className="text-sm font-bold tabular-nums">{e.temp}°</div>
                 <div className="mt-0.5 text-[0.62rem] text-primary">🌧️ {e.rain}%</div>
               </div>
             ))}

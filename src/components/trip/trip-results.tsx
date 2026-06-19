@@ -28,15 +28,15 @@ export function TripResults({
   return (
     <div>
       {overall && (
-        <div className="mb-3.5 rounded-[18px] border border-primary bg-primary-container p-4 text-on-primary-container">
-          <div className="text-[0.95rem] font-extrabold">
+        <div className="mb-3.5 rounded-[28px] bg-primary-container p-5 text-on-primary-container">
+          <div className="text-base font-semibold leading-tight">
             {t("tr.packFor", {
               place: place.short,
               from: fmtDayDate(weather.daily.time[0]),
               to: fmtDayDate(weather.daily.time[weather.daily.time.length - 1]),
             })}
           </div>
-          <div className="mb-3 text-xs opacity-80">
+          <div className="mb-3 text-xs tabular-nums opacity-70">
             {t("tr.upTo", { min: Math.round(overall.minT), max: Math.round(overall.maxT), rain: Math.round(overall.maxRain) })}
           </div>
           <OutfitTiles
@@ -54,7 +54,7 @@ export function TripResults({
             size={28}
           />
           {intl && (
-            <div className="mt-3 rounded-md border border-primary/40 bg-black/20 px-3 py-2.5 text-xs font-bold">
+            <div className="mt-3 rounded-xl bg-current/[0.07] px-3 py-2.5 text-xs font-bold">
               {t("tr.passport", { country: place.country })}
             </div>
           )}
@@ -118,11 +118,11 @@ function TripDayCard({
           <div className="font-bold">{fmtDayDate(date)}</div>
           <div className="text-xs text-on-surface-variant">{t(labelKey)}</div>
         </div>
-        <div className="text-xl font-extrabold">
+        <div className="text-xl font-extrabold tabular-nums">
           {min}° / {max}°
         </div>
       </div>
-      <div className="mb-2.5 text-xs text-on-surface-variant">
+      <div className="mb-2.5 text-xs tabular-nums text-on-surface-variant">
         🌧️ {weather.daily.precipitation_probability_max[index] ?? "–"}% · 💨{" "}
         {Math.round(weather.daily.windspeed_10m_max[index])} km/h
       </div>

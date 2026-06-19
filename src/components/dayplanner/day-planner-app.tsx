@@ -26,8 +26,11 @@ import { RoutesList } from "./routes-list";
 export default function DayPlannerApp() {
   const { theme, toggleTheme } = useTheme();
   const p = useDayPlanner();
+  // Latest-value ref so the once-registered touch handlers read fresh state.
   const pRef = useRef(p);
-  pRef.current = p;
+  useEffect(() => {
+    pRef.current = p;
+  });
   const [pullArmed, setPullArmed] = useState(false);
 
   // Touch gestures: pull-to-refresh + swipe to switch direction.
@@ -73,8 +76,9 @@ export default function DayPlannerApp() {
     return <p className="text-sm text-on-surface-variant">{p.t("dp.loading")}</p>;
   }
 
+  const sinceUpdate = p.now.getTime() - (p.lastUpdatedAt ?? 0);
   const updatedText = p.lastUpdatedAt
-    ? `${Date.now() - p.lastUpdatedAt < 60000 ? p.t("dp.updatedNow") : p.t("dp.updatedAgo", { t: fmtMins(Math.floor((Date.now() - p.lastUpdatedAt) / 60000), p.t) })} · ${p.appVersion}`
+    ? `${sinceUpdate < 60000 ? p.t("dp.updatedNow") : p.t("dp.updatedAgo", { t: fmtMins(Math.floor(sinceUpdate / 60000), p.t) })} · ${p.appVersion}`
     : "";
 
   return (

@@ -33,8 +33,6 @@ Select.displayName = "Select";
 
 export function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="text-[0.72rem] font-bold uppercase tracking-wider text-on-surface-variant">
-      {children}
-    </span>
+    <span className="text-xs font-medium text-on-surface-variant">{children}</span>
   );
 }
