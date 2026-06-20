@@ -5,6 +5,7 @@ import { I18nProvider } from "@/context/I18nProvider";
 import { AppShell } from "@/components/layout/app-shell";
 import { ServiceWorker } from "@/components/pwa/service-worker";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <InstallPrompt />
             <AppShell>{children}</AppShell>
             <ServiceWorker />
+            <SpeedInsights />
           </I18nProvider>
         </ThemeProvider>
       </body>
