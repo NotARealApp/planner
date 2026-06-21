@@ -13,7 +13,6 @@ import {
 import { PLANNER_CONFIG } from "@/hooks/use-day-planner";
 import { leaveTierClass } from "@/components/ui/tier";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPinIcon } from "@/components/icons/nav-icons";
 import { RouteLegs } from "./route-legs";
@@ -73,11 +72,15 @@ export function RoutesList({
       : null;
 
   return (
-    <Card>
-      <CardTitle>{title}</CardTitle>
-      {staleNote && <p className="mb-3 text-xs text-status-warn">{staleNote}</p>}
+    <section className="mb-3">
+      {/* Section-header rhythm: the list title sits on the page, the routes are
+          standalone cards below it (no wrapping container). */}
+      <div className="mb-3 flex items-end justify-between gap-3 px-1">
+        <h2 className="text-sm font-medium text-on-surface-variant">{title}</h2>
+        {staleNote && <span className="text-xs text-status-warn">{staleNote}</span>}
+      </div>
       {commonWalk && (
-        <p className="mb-3 text-xs text-on-surface-variant">
+        <p className="mb-3 px-1 text-xs text-on-surface-variant">
           🚶 {t("dp.walkTo", { min: commonWalk.minutes, dest: commonWalk.dest })}
         </p>
       )}
@@ -123,7 +126,7 @@ export function RoutesList({
           )}
         </>
       )}
-    </Card>
+    </section>
   );
 }
 
@@ -174,8 +177,10 @@ function RouteRow({
         }
       }}
       className={cn(
-        "mb-2 cursor-pointer rounded-2xl border-s-4 border-outline bg-surface-high p-3 transition hover:bg-surface-highest",
-        isChosen && "border-s-status-good bg-status-good/10 ring-2 ring-inset ring-status-good",
+        // Standalone card on the page (section-header rhythm). Chosen route keeps
+        // the green "catch this" accent — a left bar + ring.
+        "mb-2.5 cursor-pointer rounded-2xl border border-outline-variant bg-surface-container p-3.5 transition hover:bg-surface-high",
+        isChosen && "border-s-4 border-s-status-good bg-status-good/10 ring-2 ring-inset ring-status-good",
       )}
     >
       {isChosen && (

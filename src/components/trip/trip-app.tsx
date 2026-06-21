@@ -1,9 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { IconLink } from "@/components/ui/icon-button";
 import { AppHeader, PageSubtitle } from "@/components/layout/app-header";
-import { HomeGridIcon } from "@/components/icons/nav-icons";
 import { ThemeToggle } from "@/components/icons/theme-toggle";
 import { useI18n } from "@/context/I18nProvider";
 import { useTheme } from "@/context/ThemeProvider";
@@ -89,14 +87,7 @@ export default function TripApp() {
     <>
       <AppHeader
         title={t("tr.title")}
-        actions={
-          <>
-            <IconLink href="/apps" aria-label={t("a11y.home")}>
-              <HomeGridIcon />
-            </IconLink>
-            <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          </>
-        }
+        actions={<ThemeToggle theme={theme} onToggle={toggleTheme} />}
       />
       <PageSubtitle>{t("tr.subtitle")}</PageSubtitle>
 

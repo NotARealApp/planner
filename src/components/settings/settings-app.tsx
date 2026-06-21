@@ -1,12 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { IconLink } from "@/components/ui/icon-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Select } from "@/components/ui/input";
 import { AppHeader, PageSubtitle } from "@/components/layout/app-header";
-import { HomeGridIcon, GlobeIcon, HouseIcon, BuildingIcon } from "@/components/icons/nav-icons";
+import { GlobeIcon, HouseIcon, BuildingIcon } from "@/components/icons/nav-icons";
 import { ThemeToggle } from "@/components/icons/theme-toggle";
 import { AddressField, StatusMessage, TimeFields } from "@/components/settings/address-field";
 import { useI18n } from "@/context/I18nProvider";
@@ -115,14 +114,7 @@ export default function SettingsApp() {
     <>
       <AppHeader
         title={t("set.title")}
-        actions={
-          <>
-            <IconLink href="/apps" aria-label={t("a11y.home")}>
-              <HomeGridIcon />
-            </IconLink>
-            <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          </>
-        }
+        actions={<ThemeToggle theme={theme} onToggle={toggleTheme} />}
       />
       <PageSubtitle>{t("set.subtitle")}</PageSubtitle>
 
