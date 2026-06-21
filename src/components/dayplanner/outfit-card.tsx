@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { OutfitTiles } from "@/components/icons/weather-icons";
 import { WeatherStrip } from "./weather-strip";
 import type { WeatherData } from "@/lib/weather";
@@ -41,11 +41,14 @@ export function OutfitCard({
   t,
 }: OutfitCardProps) {
   return (
-    <Card>
-      <CardTitle>{title}</CardTitle>
-      {weather && (
-        <WeatherStrip data={weather} dayIdx={dayIdx} open={hourlyOpen} onToggle={onToggleHourly} t={t} />
-      )}
+    <section className="mb-3">
+      {/* Section-header rhythm: title on the page, card below — matching the
+          transit list, so the screen reads as a consistent stack of sections. */}
+      <h2 className="mb-3 px-1 text-sm font-medium text-on-surface-variant">{title}</h2>
+      <Card className="mb-0">
+        {weather && (
+          <WeatherStrip data={weather} dayIdx={dayIdx} open={hourlyOpen} onToggle={onToggleHourly} t={t} />
+        )}
       {loading || !wearKey ? (
         <p className="text-sm text-on-surface-variant">{t("dp.loading")}</p>
       ) : (
@@ -69,6 +72,7 @@ export function OutfitCard({
           )}
         </>
       )}
-    </Card>
+      </Card>
+    </section>
   );
 }
