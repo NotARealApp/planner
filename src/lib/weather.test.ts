@@ -99,6 +99,11 @@ describe("computeOutfit", () => {
     expect(computeOutfit(15, 0, 30).noteKeys).toContain("dp.windy");
     expect(computeOutfit(15, 0, 29).noteKeys).not.toContain("dp.windy");
   });
+  it("flags sunscreen at UV 6+", () => {
+    expect(computeOutfit(20, 0, 0, "trip", 6).sunscreen).toBe(true);
+    expect(computeOutfit(20, 0, 0, "trip", 5).sunscreen).toBe(false);
+    expect(computeOutfit(20, 0, 0, "trip", null).sunscreen).toBe(false);
+  });
   it("varies wording by variant for mild temps", () => {
     expect(computeOutfit(18, 0, 0, "dayplanner").jacketTextKey).toBe("fit.noCoat");
     expect(computeOutfit(18, 0, 0, "trip").jacketTextKey).toBe("fit.noCoatS");

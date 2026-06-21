@@ -11,6 +11,7 @@ type OutfitCardProps = {
   jacketTextKey: string;
   umbrella: boolean;
   sunny: boolean;
+  sunscreen: boolean;
   notes: string[];
   loading: boolean;
   t: (key: string) => string;
@@ -24,6 +25,7 @@ export function OutfitCard({
   jacketTextKey,
   umbrella,
   sunny,
+  sunscreen,
   notes,
   loading,
   t,
@@ -42,10 +44,12 @@ export function OutfitCard({
             jacketText={t(jacketTextKey)}
             umbrella={umbrella}
             sunny={sunny}
+            sunscreen={sunscreen}
             wearLabel={t("dp.wear")}
             outerwearLabel={t("dp.outerwear")}
             umbrellaLabel={t("dp.umbrella")}
             sunglassesLabel={t("dp.sunglasses")}
+            sunscreenLabel={t("dp.sunscreen")}
             yesLabel={t("dp.yes")}
           />
           {notes.length > 0 && (

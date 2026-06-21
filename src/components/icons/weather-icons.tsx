@@ -14,6 +14,7 @@ const OUTFIT_ICONS: Record<string, string> = {
   coat: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 5 5 4 11l2.2.6V21h11.6v-9.4L20 11l-1-6-3-2-3 3-3-3Z"/><path d="M12 6.5V21M11.4 11h.01M11.4 14h.01"/></svg>`,
   umbrella: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 8 0 0 1 9 8H3a9 8 0 0 1 9-8Z"/><path d="M12 11v7a2.5 2.5 0 0 0 5 0"/><path d="M12 3V2"/></svg>`,
   glasses: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="7" height="6" rx="3"/><rect x="14" y="10" width="7" height="6" rx="3"/><path d="M10 12.5q2-1 4 0"/><path d="M3 11 1 8.5M21 11l2-2.5"/></svg>`,
+  sunscreen: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="8" width="10" height="13" rx="2"/><path d="M9.5 8V6.5a2.5 2.5 0 0 1 5 0V8"/><path d="M12 12.5v4M10 14.5h4"/></svg>`,
 };
 
 function SvgIcon({ html, size }: { html: string; size?: number }) {
@@ -38,10 +39,12 @@ export function OutfitTiles({
   jacketText,
   umbrella,
   sunny,
+  sunscreen,
   wearLabel,
   outerwearLabel,
   umbrellaLabel,
   sunglassesLabel,
+  sunscreenLabel,
   yesLabel,
   size = 36,
 }: {
@@ -51,17 +54,24 @@ export function OutfitTiles({
   jacketText: string;
   umbrella?: boolean;
   sunny?: boolean;
+  sunscreen?: boolean;
   wearLabel: string;
   outerwearLabel: string;
   umbrellaLabel: string;
   sunglassesLabel: string;
+  sunscreenLabel?: string;
   yesLabel: string;
   size?: number;
 }) {
-  const tiles = [
-    { icon: wearKey, label: wearLabel, text: wearText },
-    { icon: jacketKey, label: outerwearLabel, text: jacketText },
-  ];
+  const sunTile = { icon: "sunscreen", label: sunscreenLabel ?? "", text: yesLabel };
+  const tiles = [{ icon: wearKey, label: wearLabel, text: wearText }];
+  // No jacket needed (warm) + high UV → drop the "Outerwear: No" tile, show sunscreen instead.
+  if (sunscreen && jacketKey === "sun") {
+    tiles.push(sunTile);
+  } else {
+    tiles.push({ icon: jacketKey, label: outerwearLabel, text: jacketText });
+    if (sunscreen) tiles.push(sunTile);
+  }
   if (umbrella) tiles.push({ icon: "umbrella", label: umbrellaLabel, text: yesLabel });
   if (sunny) tiles.push({ icon: "glasses", label: sunglassesLabel, text: yesLabel });
 

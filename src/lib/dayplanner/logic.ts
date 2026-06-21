@@ -413,7 +413,7 @@ export async function fetchRoutesPadded(
 export async function fetchWeather(lat: number, lon: number) {
   const url =
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,windspeed_10m_max` +
+    `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,windspeed_10m_max,uv_index_max` +
     `&hourly=temperature_2m,apparent_temperature,precipitation_probability,weathercode,windspeed_10m` +
     `&timezone=Europe%2FBerlin&forecast_days=2`;
   return fetch(url).then((r) => r.json());

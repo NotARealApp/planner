@@ -191,6 +191,15 @@ export function useDayPlanner() {
     home: null,
     office: null,
   });
+  // Which day `routeCache` was loaded for. The cache is keyed by direction, so on
+  // a fast day switch it still holds the old day's routes until the refetch lands;
+  // consumers must ignore it when this doesn't match selectedDay (else the today
+  // live countdown renders tomorrow's route as a ~25h "leave in").
+  const [routeCacheDay, setRouteCacheDay] = useState(0);
+  // Monotonic token for the latest loadRoutes call. An in-flight fetch from a
+  // superseded call (e.g. tomorrow's, after the user flipped back to today)
+  // must not write its routes into state — that overwrite is the ~25h flash.
+  const loadSeqRef = useRef(0);
   const [liveLoaded, setLiveLoaded] = useState({ home: false, office: false });
   const [routeCacheSavedAt, setRouteCacheSavedAt] = useState(0);
   const [visibleCount, setVisibleCount] = useState(5);
@@ -288,6 +297,8 @@ export function useDayPlanner() {
 
   const loadRoutes = useCallback(
     async (dayIdx: number, dir: Direction, places: PlannerSettings) => {
+      const seq = ++loadSeqRef.current;
+      const stale = () => seq !== loadSeqRef.current;
       setRoutesError(false);
       let cache: { home: RouteSummary[] | null; office: RouteSummary[] | null } = {
         home: null,
@@ -295,6 +306,7 @@ export function useDayPlanner() {
       };
       let loaded = { home: false, office: false };
 
+      setRouteCacheDay(dayIdx);
       const planKey = `${planTime.mode}:${planTime.time}`;
       const cached = loadRouteCache(dayIdx, planKey);
       if (cached) {
@@ -328,10 +340,12 @@ export function useDayPlanner() {
             ),
           };
           loaded = { ...loaded, [d]: true };
+          if (stale()) return; // a newer day/direction load supersedes this one
           setRouteCache({ ...cache });
           setLiveLoaded({ ...loaded });
           if (dayIdx === 0 && cache[d]) {
             await enrichRealtime(cache[d]);
+            if (stale()) return;
             setRouteCache({ ...cache });
           }
         } catch {
@@ -347,6 +361,7 @@ export function useDayPlanner() {
         fetchDir("home", places.office, places.home, places.homeReturn),
       ]);
 
+      if (stale()) return;
       setLiveLoaded(loaded);
       setRouteCacheSavedAt(Date.now());
       saveRouteCache(dayIdx, cache, loaded, planKey);
@@ -605,7 +620,9 @@ export function useDayPlanner() {
     }
   }, [dayOff, dayOffMsg, t]);
 
-  const rawSummaries = routeCache[selectedDirection] || [];
+  // Ignore the cache while it still belongs to the previously selected day —
+  // prevents a stale next-day route flashing as a "25h" live countdown.
+  const rawSummaries = routeCacheDay === selectedDay ? routeCache[selectedDirection] || [] : [];
   const now = new Date();
   const planActive = planTime.mode !== "now" && !!planTime.time;
   // The arrive-by deadline (selected day at the picked time).
@@ -665,7 +682,8 @@ export function useDayPlanner() {
     const wind = daytimeMaxWind(weatherData, selectedDay);
     const realMin = daytimeMinTemp(weatherData, selectedDay);
     const minTemp = daytimeApparentMin(weatherData, selectedDay);
-    const base = computeOutfit(minTemp, rainProb, wind, "dayplanner");
+    const uv = weatherData.daily.uv_index_max?.[selectedDay] ?? null;
+    const base = computeOutfit(minTemp, rainProb, wind, "dayplanner", uv);
     const notes = [...base.noteKeys.map((k) => t(k))];
     if (isFinite(realMin) && isFinite(minTemp) && Math.abs(minTemp - realMin) >= 2) {
       notes.unshift(t("dp.feelsLike", { feels: Math.round(minTemp), actual: Math.round(realMin) }));

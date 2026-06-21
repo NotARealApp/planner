@@ -46,10 +46,12 @@ export function TripResults({
             jacketText={t(overall.outfit.jacketTextKey)}
             umbrella={overall.outfit.umbrella}
             sunny={overall.sunny}
+            sunscreen={overall.outfit.sunscreen}
             wearLabel={t("tr.wear")}
             outerwearLabel={t("tr.outerwear")}
             umbrellaLabel={t("tr.umbrella")}
             sunglassesLabel={t("tr.sunglasses")}
+            sunscreenLabel={t("tr.sunscreen")}
             yesLabel={t("tr.yes")}
             size={28}
           />
@@ -108,6 +110,8 @@ function TripDayCard({
     wMin ?? min,
     wRain ?? weather.daily.precipitation_probability_max[index],
     wWind ?? weather.daily.windspeed_10m_max[index],
+    "trip",
+    weather.daily.uv_index_max?.[index] ?? null,
   );
 
   return (
@@ -133,10 +137,12 @@ function TripDayCard({
         jacketText={t(outfit.jacketTextKey)}
         umbrella={outfit.umbrella}
         sunny={sunnyHours(weather, index) >= SUNNY_HOURS}
+        sunscreen={outfit.sunscreen}
         wearLabel={t("tr.wear")}
         outerwearLabel={t("tr.outerwear")}
         umbrellaLabel={t("tr.umbrella")}
         sunglassesLabel={t("tr.sunglasses")}
+        sunscreenLabel={t("tr.sunscreen")}
         yesLabel={t("tr.yes")}
         size={28}
       />

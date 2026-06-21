@@ -35,6 +35,8 @@ export function weatherInfo(code: number): [string, string] {
 
 export const WAKING = { start: 8, end: 21 };
 export const SUNNY_HOURS = 3;
+// WHO UV index: 6+ is "high" — sun protection worth flagging.
+export const UV_HIGH = 6;
 
 export type WeatherData = {
   daily: {
@@ -44,6 +46,7 @@ export type WeatherData = {
     precipitation_probability_max: (number | null)[];
     weathercode: (number | null)[];
     windspeed_10m_max: number[];
+    uv_index_max?: (number | null)[];
   };
   hourly: {
     time: string[];
@@ -137,6 +140,7 @@ export type OutfitResult = {
   jacketKey: string;
   jacketTextKey: string;
   umbrella: boolean;
+  sunscreen: boolean;
   noteKeys: string[];
 };
 
@@ -145,6 +149,7 @@ export function computeOutfit(
   rainProb: number | null,
   wind: number,
   variant: "dayplanner" | "trip" = "trip",
+  uv: number | null = null,
 ): OutfitResult {
   let wearKey: string, wearTextKey: string, jacketKey: string, jacketTextKey: string;
   const noteKeys: string[] = [];
@@ -180,5 +185,6 @@ export function computeOutfit(
 
   if (wind >= 30) noteKeys.push("dp.windy");
   const umbrella = rainProb != null && rainProb >= 30;
-  return { wearKey, wearTextKey, jacketKey, jacketTextKey, umbrella, noteKeys };
+  const sunscreen = uv != null && uv >= UV_HIGH;
+  return { wearKey, wearTextKey, jacketKey, jacketTextKey, umbrella, sunscreen, noteKeys };
 }

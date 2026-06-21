@@ -18,6 +18,7 @@ import {
   UpdatedFooter,
 } from "./day-stepper";
 import { DayPlannerSkeleton } from "./day-planner-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LeaveByCard } from "./leave-by-card";
 import { OutfitCard } from "./outfit-card";
 import { PlanTimePicker } from "./plan-time-picker";
@@ -219,6 +220,10 @@ export default function DayPlannerApp() {
             planMissed={p.planMissed}
             t={p.t}
           />
+        ) : p.loading && !p.routesError ? (
+          // MVG routes still loading (first load or day-switch refetch) — hold the
+          // slot with a hero skeleton instead of a gap / stale flash.
+          <Skeleton className="mb-3 h-40 rounded-[28px]" />
         ) : null}
 
         <OutfitCard
@@ -229,6 +234,7 @@ export default function DayPlannerApp() {
           jacketTextKey={p.outfit?.jacketTextKey ?? ""}
           umbrella={p.outfit?.umbrella ?? false}
           sunny={p.outfit?.sunny ?? false}
+          sunscreen={p.outfit?.sunscreen ?? false}
           notes={p.outfit?.notes ?? []}
           loading={!p.outfit}
           t={p.t}

@@ -85,7 +85,7 @@ export async function geocodeTripPlace(name: string): Promise<TripPlace[]> {
 export async function fetchTripWeather(lat: number, lon: number, start: string, end: string) {
   const url =
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,windspeed_10m_max` +
+    `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,windspeed_10m_max,uv_index_max` +
     `&hourly=temperature_2m,apparent_temperature,precipitation_probability,weathercode,windspeed_10m` +
     `&timezone=auto&start_date=${start}&end_date=${end}`;
   return fetch(url).then((r) => r.json()) as Promise<WeatherData>;
@@ -96,6 +96,7 @@ export function tripOverall(data: WeatherData) {
   let maxT = -Infinity;
   let maxRain = 0;
   let maxWind = 0;
+  let maxUv = 0;
   let anySunny = false;
   let valid = 0;
 
@@ -110,8 +111,9 @@ export function tripOverall(data: WeatherData) {
     maxT = Math.max(maxT, data.daily.temperature_2m_max[i]);
     maxRain = Math.max(maxRain, dRain ?? data.daily.precipitation_probability_max[i] ?? 0);
     maxWind = Math.max(maxWind, dWind ?? data.daily.windspeed_10m_max[i]);
+    maxUv = Math.max(maxUv, data.daily.uv_index_max?.[i] ?? 0);
   }
 
   if (!valid) return null;
-  return { minT, maxT, maxRain, maxWind, sunny: anySunny, outfit: computeOutfit(minT, maxRain, maxWind) };
+  return { minT, maxT, maxRain, maxWind, sunny: anySunny, outfit: computeOutfit(minT, maxRain, maxWind, "trip", maxUv) };
 }

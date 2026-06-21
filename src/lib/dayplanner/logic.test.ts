@@ -629,6 +629,7 @@ describe("fetchWeather", () => {
     const url = fn.mock.calls[0][0];
     expect(url).toContain("latitude=48.1&longitude=11.5");
     expect(url).toContain("forecast_days=2");
+    expect(url).toContain("uv_index_max"); // drives the sunscreen tile
   });
 });
 
