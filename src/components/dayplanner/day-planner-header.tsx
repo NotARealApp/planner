@@ -1,8 +1,6 @@
 "use client";
 
-import { IconLink } from "@/components/ui/icon-button";
 import { AppHeader } from "@/components/layout/app-header";
-import { HomeGridIcon, SettingsIcon } from "@/components/icons/nav-icons";
 import { ThemeToggle } from "@/components/icons/theme-toggle";
 
 type DayPlannerHeaderProps = {
@@ -13,27 +11,14 @@ type DayPlannerHeaderProps = {
   onToggleTheme: () => void;
 };
 
+// The bottom nav now owns navigation (Today/Trip/Gym/Settings), so the header
+// keeps only the theme toggle — no more redundant grid/settings links.
 export function DayPlannerHeader({
   title,
-  homeLabel,
-  settingsLabel,
   theme,
   onToggleTheme,
 }: DayPlannerHeaderProps) {
   return (
-    <AppHeader
-      title={title}
-      actions={
-        <>
-          <IconLink href="/apps" aria-label={homeLabel}>
-            <HomeGridIcon />
-          </IconLink>
-          <IconLink href="/settings" aria-label={settingsLabel}>
-            <SettingsIcon />
-          </IconLink>
-          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-        </>
-      }
-    />
+    <AppHeader title={title} actions={<ThemeToggle theme={theme} onToggle={onToggleTheme} />} />
   );
 }

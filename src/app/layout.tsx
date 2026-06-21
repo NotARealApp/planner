@@ -3,6 +3,7 @@ import { Roboto, Noto_Sans_Malayalam, Vazirmatn, Bricolage_Grotesque } from "nex
 import { ThemeProvider } from "@/context/ThemeProvider";
 import { I18nProvider } from "@/context/I18nProvider";
 import { AppShell } from "@/components/layout/app-shell";
+import { BottomNav } from "@/components/layout/bottom-nav";
 import { ServiceWorker } from "@/components/pwa/service-worker";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <I18nProvider>
             <InstallPrompt />
             <AppShell>{children}</AppShell>
+            <BottomNav />
             <ServiceWorker />
             <SpeedInsights />
             <Analytics />

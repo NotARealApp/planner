@@ -25,7 +25,7 @@ export function StickyLeaveBar({
       type="button"
       role="status"
       onClick={onClick}
-      className="fixed inset-x-0 bottom-0 z-50 flex items-center gap-2 border-t border-outline bg-surface-container px-4 py-3 text-sm font-semibold shadow-lg"
+      className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-30 flex items-center gap-2 border-t border-outline bg-surface-container px-4 py-3 text-sm font-semibold shadow-lg"
     >
       <span>{icon}</span>
       <span>{time}</span>
@@ -51,7 +51,7 @@ export function HintToast({
   return (
     <div
       role="status"
-      className="fixed inset-x-4 bottom-4 z-50 flex items-center gap-3 rounded-xl border border-outline bg-surface-container p-4 shadow-elev-2"
+      className="fixed inset-x-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-50 flex items-center gap-3 rounded-xl border border-outline bg-surface-container p-4 shadow-elev-2"
     >
       <span className="flex-1 text-sm">{message}</span>
       <Button variant="soft" className="min-h-9 shrink-0 px-4 py-2 text-xs" onClick={onDismiss}>
@@ -73,7 +73,7 @@ export function UndoToast({
   return (
     <div
       role="status"
-      className="fixed inset-x-4 bottom-4 z-50 flex items-center gap-3 rounded-xl border border-outline bg-surface-container p-4 shadow-elev-2"
+      className="fixed inset-x-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-50 flex items-center gap-3 rounded-xl border border-outline bg-surface-container p-4 shadow-elev-2"
     >
       <span className="flex-1 text-sm">{message}</span>
       <Button variant="soft" className="min-h-9 shrink-0 px-4 py-2 text-xs" onClick={onAction}>
