@@ -78,7 +78,14 @@ export default function SettingsApp() {
       setStatusVariant("bad");
       return;
     }
-    const settings: PlannerSettings = { home: picked.home, office: picked.office, ...readTimes() };
+    // Keep any destinations the Places page saved — they live in the same blob
+    // but this form doesn't edit them, so re-read them fresh and pass through.
+    const settings: PlannerSettings = {
+      home: picked.home,
+      office: picked.office,
+      ...readTimes(),
+      destinations: loadPlannerSettings().destinations,
+    };
     savePlannerSettings(settings);
     setStatus(t("set.savedOk"));
     setStatusVariant("ok");

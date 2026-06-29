@@ -37,6 +37,9 @@ jobs:
         run: npm run build
         env:
           GITHUB_PAGES: true
+          # Optional: Cloudflare Worker URL for live gym occupancy (see proxy/).
+          # Set repo variable GYM_PROXY to enable; unset → gym panel stays hidden.
+          NEXT_PUBLIC_GYM_PROXY: ${{ vars.GYM_PROXY }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

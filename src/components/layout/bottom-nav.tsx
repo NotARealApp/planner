@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import {
   CalendarTodayIcon,
   SuitcaseIcon,
-  DumbbellIcon,
+  MapPinIcon,
   SettingsIcon,
 } from "@/components/icons/nav-icons";
 
@@ -17,7 +17,7 @@ import {
 const TABS = [
   { href: "/dayplanner", labelKey: "nav.today", Icon: CalendarTodayIcon },
   { href: "/trip", labelKey: "nav.trip", Icon: SuitcaseIcon },
-  { href: "/gym", labelKey: "nav.gym", Icon: DumbbellIcon },
+  { href: "/places", labelKey: "nav.places", Icon: MapPinIcon },
   { href: "/settings", labelKey: "nav.settings", Icon: SettingsIcon },
 ] as const;
 

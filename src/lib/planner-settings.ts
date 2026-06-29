@@ -7,11 +7,25 @@ export type Place = {
 
 export type TimeOfDay = { hour: number; minute: number };
 
+// A saved place you travel to, anchored to one of the two commute endpoints as
+// its origin — "from home or work". The planner already knows home/office, so a
+// destination only stores its own coords + which anchor it leaves from.
+export type Destination = {
+  id: string;
+  label: string;
+  place: Place;
+  origin: "home" | "office";
+  // Optional McFit/RSG studio id — when set, the destination panel also shows
+  // live gym occupancy (see lib/gym.ts).
+  gymStudioId?: string;
+};
+
 export type PlannerSettings = {
   home: Place;
   office: Place;
   officeArrival: TimeOfDay;
   homeReturn: TimeOfDay;
+  destinations: Destination[];
 };
 
 const EMPTY_PLACE: Place = { label: "", lat: 0, lon: 0 };
@@ -23,6 +37,7 @@ export const DEFAULT_PLACES: PlannerSettings = {
   office: EMPTY_PLACE,
   officeArrival: { hour: 9, minute: 0 },
   homeReturn: { hour: 18, minute: 0 },
+  destinations: [],
 };
 
 export const SETTINGS_KEY = "planner_settings";
@@ -42,6 +57,7 @@ export function loadPlannerSettings(): PlannerSettings {
       office: s.office || DEFAULT_PLACES.office,
       officeArrival: s.officeArrival || DEFAULT_PLACES.officeArrival,
       homeReturn: s.homeReturn || DEFAULT_PLACES.homeReturn,
+      destinations: Array.isArray(s.destinations) ? s.destinations : [],
     };
   } catch {
     return DEFAULT_PLACES;
@@ -50,6 +66,12 @@ export function loadPlannerSettings(): PlannerSettings {
 
 export function savePlannerSettings(settings: PlannerSettings) {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+// Read-modify-write just the destinations list, leaving home/office/times
+// untouched — the Places page owns destinations, the Settings page owns the rest.
+export function saveDestinations(destinations: Destination[]) {
+  savePlannerSettings({ ...loadPlannerSettings(), destinations });
 }
 
 export function resetPlannerSettings() {
